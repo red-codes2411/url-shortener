@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>URL Shortener</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          background: #eef1f5;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem 1rem;
+        }
+
+        .app {
+          width: 100%;
+          max-width: 560px;
+        }
+
+        .header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 1.5rem;
+        }
+
+        .header-icon {
+          width: 40px;
+          height: 40px;
+          background: #1a2e4a;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+        }
+
+        .header h1 {
+          font-size: 24px;
+          font-weight: 600;
+          color: #1a2e4a;
+        }
+
+        .card {
+          background: #ffffff;
+          border: 1px solid #c8d0da;
+          border-radius: 14px;
+          padding: 1.5rem;
+        }
+
+        .input-row {
+          display: flex;
+          gap: 8px;
+        }
+
+        .url-input {
+          flex: 1;
+          padding: 11px 14px;
+          font-size: 14px;
+          border: 1px solid #c8d0da;
+          border-radius: 8px;
+          color: #1a2e4a;
+          outline: none;
+          background: #f4f6f9;
+          font-family: inherit;
+          transition: border-color 0.2s, background 0.2s;
+        }
+
+        .url-input:focus {
+          border-color: #1a2e4a;
+          background: #fff;
+        }
+
+        .url-input::placeholder {
+          color: #9aa5b1;
+        }
+
+        .btn {
+          padding: 11px 22px;
+          background: #1a2e4a;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          white-space: nowrap;
+          font-family: inherit;
+          transition: background 0.2s;
+        }
+
+        .btn:hover { background: #243d5e; }
+        .btn:active { background: #111f30; }
+
+        .result-card {
+          background: #f4f6f9;
+          border: 1px solid #c8d0da;
+          border-radius: 10px;
+          padding: 1.25rem;
+          margin-top: 1.25rem;
+          display: none;
+        }
+
+        .result-label {
+          font-size: 11px;
+          font-weight: 600;
+          color: #5a6a7a;
+          text-transform: uppercase;
+          letter-spacing: 0.6px;
+          margin-bottom: 6px;
+        }
+
+        .url-box {
+          background: #ffffff;
+          border: 1px solid #c8d0da;
+          border-radius: 8px;
+          padding: 10px 14px;
+          margin-bottom: 14px;
+          word-break: break-all;
+          overflow-wrap: break-word;
+          font-size: 14px;
+          line-height: 1.6;
+          min-height: 42px;
+        }
+
+        .short-link {
+          color: #1a2e4a;
+          font-weight: 600;
+          text-decoration: none;
+        }
+
+        .short-link:hover { text-decoration: underline; }
+
+        .original-url {
+          color: #5a6a7a;
+        }
+
+        .action-row {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .stats-btn {
+          padding: 9px 18px;
+          background: transparent;
+          color: #1a2e4a;
+          border: 1px solid #1a2e4a;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          font-family: inherit;
+          transition: background 0.2s, color 0.2s;
+        }
+
+        .stats-btn:hover {
+          background: #1a2e4a;
+          color: #fff;
+        }
+
+        .copy-btn {
+          padding: 9px 18px;
+          background: transparent;
+          color: #5a6a7a;
+          border: 1px solid #c8d0da;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          font-family: inherit;
+          transition: border-color 0.2s, color 0.2s;
+        }
+
+        .copy-btn:hover {
+          border-color: #1a2e4a;
+          color: #1a2e4a;
+        }
+
+        .stats-box {
+          display: none;
+          background: #ffffff;
+          border: 1px solid #c8d0da;
+          border-radius: 8px;
+          padding: 12px 14px;
+          margin-top: 14px;
+          display: none;
+        }
+
+        .stats-grid {
+          display: flex;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+        }
+
+        .stat-item {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+        }
+
+        .stat-label {
+          font-size: 11px;
+          color: #9aa5b1;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 600;
+        }
+
+        .stat-value {
+          font-size: 20px;
+          font-weight: 600;
+          color: #1a2e4a;
+        }
+
+        .stat-code {
+          font-size: 15px;
+          font-weight: 600;
+          color: #1a2e4a;
+          font-family: monospace;
+        }
+
+        .error-msg {
+          display: none;
+          margin-top: 10px;
+          padding: 10px 14px;
+          background: #fff0f0;
+          border: 1px solid #f5c6c6;
+          border-radius: 8px;
+          color: #a03030;
+          font-size: 13px;
+        }
+
+        .footer {
+          text-align: center;
+          margin-top: 1.5rem;
+          font-size: 12px;
+          color: #9aa5b1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="header">
+        <div class="header-icon">🔗</div>
+        <h1>URL Shortener</h1>
+    </div>
+
+    <div class="card">
+        <div class="input-row">
+            <input
+                    class="url-input"
+                    id="urlInput"
+                    type="text"
+                    placeholder="Paste your long URL here..."
+            />
+            <button class="btn" onclick="shorten()">Shorten</button>
+        </div>
+
+        <div class="error-msg" id="errorMsg"></div>
+
+        <div class="result-card" id="resultCard">
+            <div class="result-label">Short URL</div>
+            <div class="url-box">
+                <a class="short-link" id="shortLink" href="#" target="_blank"></a>
+            </div>
+
+            <div class="result-label">Original URL</div>
+            <div class="url-box">
+                <span class="original-url" id="origUrl"></span>
+            </div>
+
+            <div class="action-row">
+                <button class="stats-btn" onclick="checkStats()">Check Stats</button>
+                <button class="copy-btn" id="copyBtn" onclick="copyShort()">Copy short URL</button>
+            </div>
+
+            <div class="stats-box" id="statsBox">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Clicks</span>
+                        <span class="stat-value" id="clickCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Short Code</span>
+                        <span class="stat-code" id="codeDisplay"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">Running on localhost:8080</div>
+</div>
+
+<script>
+    let currentCode = '';
+
+    async function shorten() {
+      const url = document.getElementById('urlInput').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.style.display = 'none';
+
+      if (!url) {
+        showError('Please enter a URL first.');
+        return;
+      }
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        showError('URL must start with http:// or https://');
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `http://localhost:8080/api/shorten?originalUrl=${encodeURIComponent(url)}`,
+          { method: 'POST' }
+        );
+        const data = await res.json();
+        currentCode = data.shortCode;
+
+        const shortUrl = `http://localhost:8080/api/${data.shortCode}`;
+        document.getElementById('shortLink').href = shortUrl;
+        document.getElementById('shortLink').textContent = shortUrl;
+        document.getElementById('origUrl').textContent = data.originalUrl;
+        document.getElementById('resultCard').style.display = 'block';
+        document.getElementById('statsBox').style.display = 'none';
+        document.getElementById('copyBtn').textContent = 'Copy short URL';
+      } catch (e) {
+        showError('Could not connect. Make sure Spring Boot is running on port 8080.');
+      }
+    }
+
+    async function checkStats() {
+      if (!currentCode) return;
+      try {
+        const res = await fetch(`http://localhost:8080/api/stats/${currentCode}`);
+        const data = await res.json();
+        document.getElementById('clickCount').textContent = data.clickCount;
+        document.getElementById('codeDisplay').textContent = data.shortCode;
+        document.getElementById('statsBox').style.display = 'block';
+      } catch (e) {
+        showError('Could not fetch stats.');
+      }
+    }
+
+    function copyShort() {
+      const link = document.getElementById('shortLink').textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = 'Copy short URL', 2000);
+      });
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    document.getElementById('urlInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') shorten();
+    });
+</script>
+
+</body>
+</html>
