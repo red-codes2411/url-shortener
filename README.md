@@ -25,6 +25,12 @@ Converts long URLs into short codes, redirects users, and tracks click counts.
 | GET | `/api/{shortCode}` | Redirect to original |
 | GET | `/api/stats/{shortCode}` | Get click stats |
 
+OUTPUTS :
+<img width="1911" height="970" alt="Screenshot 2026-04-10 001304" src="https://github.com/user-attachments/assets/7d1e94a3-2c77-4317-a04e-000ea4fae68b" />
+
+<img width="1528" height="816" alt="Screenshot 2026-04-10 001330" src="https://github.com/user-attachments/assets/d41ee455-3b73-44dc-a564-13acb4604a8c" />
+
+
 ## Running Locally
 
 1. Clone the repo
